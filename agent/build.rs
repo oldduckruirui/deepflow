@@ -82,10 +82,12 @@ fn set_build_info() -> Result<(), Box<dyn Error>> {
 fn set_build_libtrace() -> Result<(), Box<dyn Error>> {
     let output = match env::var("CARGO_CFG_TARGET_ENV")?.as_str() {
         "gnu" => Command::new("sh").arg("-c")
-            .arg("cd src/ebpf && make clean && make --no-print-directory && make tools --no-print-directory")
+            // .arg("cd src/ebpf && make clean && make --no-print-directory && make tools --no-print-directory")
+            .arg("cd src/ebpf && mkdir -p build && cd build && cmake .. && make && make tools")
             .output()?,
         "musl" => Command::new("sh").arg("-c")
-            .arg("cd src/ebpf && make clean && CC=musl-gcc CLANG=musl-clang make --no-print-directory && CC=musl-gcc CLANG=musl-clang make tools --no-print-directory")
+            // .arg("cd src/ebpf && make clean && CC=musl-gcc CLANG=musl-clang make --no-print-directory && CC=musl-gcc CLANG=musl-clang make tools --no-print-directory")
+            .arg("cd src/ebpf && mkdir -p build && cd build && cmake -DCC=musl-gcc -DCLANG=musl-clang .. && make && make tools")
             .output()?,
         _ => panic!("Unsupported target"),
     };
